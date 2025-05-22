@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+
+kind: Deployment
+metadata:
+  name: web-application
+
+spec:
+  selector:
+      matchLabels:
+        app: web-application
+  template:
+    metadata:
+      labels:
+        app: web-application
+    spec:
+      containers:
+      - name: web-application
+        image: amandatse/9.1p-web-application:latest
+        ports:
+        - containerPort: 3000
+        env:
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: MONGO_INITDB_ROOT_USERNAME
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: MONGO_INITDB_ROOT_PASSWORD
+          - name: DB_HOST
+            value: "mongodb"
+          - name: DB_PORT
+            value: "27017"
+          - name: DB_NAME
+            value: "SIT323_9_1P"
+
+
+#Detailed Documentation:
+#1. Specified the API version.
+#2. Defined the kind "Deployment" and named it "web-application".
+#3. Configured the selector to match the "web-application" app and pod template with labels, container settings and environment variables for database configuration.

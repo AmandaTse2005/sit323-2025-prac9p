@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+
+kind: Deployment
+metadata:
+  name: mongodb
+
+spec:
+  selector:
+      matchLabels:
+        app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:6.0
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: MONGO_INITDB_ROOT_USERNAME
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: MONGO_INITDB_ROOT_PASSWORD
+        volumeMounts:
+        - name: mongo-storage
+          mountPath: /data/db
+      volumes:
+      - name: mongo-storage
+        persistentVolumeClaim:
+          claimName: mongo-pvc
+
+---
+apiVersion: v1
+
+kind: PersistentVolume
+metadata:
+  name: mongo-pv
+
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data/mongo
+
+---
+apiVersion: v1
+
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+
+#Detailed Documentation:
+#1. Specified the API version.
+#2. Defined the kind "Deployment" and named it "mongodb".
+#3. Configured the selector to match the "mongodb" app and pod template with labels, container settings and environment variables for database configuration.
+#4. Specified the API version.
+#5. Defined the kind "PersistentVolume" and named it "mongo-pv".
+#6. Configured the capacity to 5Gi with the access mode "ReadWriteOnce" and used the host path "/mnt/data/mongo" for data persistence on the node.
+#7. Specified the API version.
+#8. Defined the kind "PersistentVolumeClaim" and named it "mongo-pvc".
+#9. Configured the access mode to "ReadWriteOnce" and requested 5Gi of storage for the PersistentVolumeClaim.

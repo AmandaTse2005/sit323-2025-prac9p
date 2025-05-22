@@ -1,0 +1,20 @@
+apiVersion: v1
+
+kind: Service
+metadata:
+  name: mongodb
+
+spec:
+  selector:
+    app: mongodb
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+  type: ClusterIP
+
+
+#Detailed Documentation:
+#1. Specified the API version.
+#2. Defined the kind "Service" and named it "mongodb".
+#3. Configured the selector to match the "mongodb" app and expose port 27017 using the service type "ClusterIP" for internal access.
